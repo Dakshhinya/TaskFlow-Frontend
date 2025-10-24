@@ -1,17 +1,34 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { User, Mail, Lock, CheckCircle2 } from 'lucide-react';
+import axios from 'axios';
 
 const Signup = () => {
   const navigate = useNavigate();
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [form, setFormData] = useState({username:'', email:'', password:''})
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleInput = (e:React.ChangeEvent<HTMLInputElement>)=>{
+    const {name, value}=e.target;
+    setFormData(prev =>({
+      ...prev,
+      [name] :value
+    }))
+  }
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    localStorage.setItem('user', JSON.stringify({ name, email }));
-    navigate('/dashboard');
+    try{
+      const res = await axios.post(
+        'http://localhost:3000/api/auth/signup',form
+      );
+      console.log(res.data);
+      localStorage.setItem('user', JSON.stringify({ username:form.username, email:form.email }));
+      navigate('/login')
+    }
+    catch(err){
+      console.log("Err in signup", err);
+    }
+   
   };
 
   return (
@@ -39,8 +56,9 @@ const Signup = () => {
                 <User className="absolute left-4 top-1/2 transform -translate-y-1/2 text-amber-500 w-5 h-5" />
                 <input
                   type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
+                  name= "username"
+                  value={form.username}
+                  onChange={handleInput}
                   className="w-full pl-12 pr-4 py-4 border-2 border-gray-200 rounded-xl focus:border-amber-400 focus:outline-none transition-colors bg-white"
                   placeholder="Enter your full name"
                   required
@@ -56,8 +74,9 @@ const Signup = () => {
                 <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 text-amber-500 w-5 h-5" />
                 <input
                   type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  name="email"
+                  value={form.email}
+                  onChange={handleInput}
                   className="w-full pl-12 pr-4 py-4 border-2 border-gray-200 rounded-xl focus:border-amber-400 focus:outline-none transition-colors bg-white"
                   placeholder="Enter your email"
                   required
@@ -73,8 +92,9 @@ const Signup = () => {
                 <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 text-amber-500 w-5 h-5" />
                 <input
                   type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  name="password"
+                  value={form.password}
+                  onChange={handleInput}
                   className="w-full pl-12 pr-4 py-4 border-2 border-gray-200 rounded-xl focus:border-amber-400 focus:outline-none transition-colors bg-white"
                   placeholder="Create a password"
                   required
@@ -97,7 +117,7 @@ const Signup = () => {
                 to="/login"
                 className="text-amber-600 hover:text-amber-700 font-semibold"
               >
-                Sign In
+                Log In
               </Link>
             </p>
           </div>

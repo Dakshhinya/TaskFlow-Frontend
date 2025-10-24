@@ -14,7 +14,7 @@ const Dashboard = () => {
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
       const user = JSON.parse(storedUser);
-      setUserName(user.name || user.email || 'User');
+      setUserName(user.name || 'User');
     }
 
     const storedTasks = localStorage.getItem('tasks');

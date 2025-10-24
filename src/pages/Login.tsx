@@ -1,15 +1,47 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Mail, Lock, CheckCircle2 } from 'lucide-react';
+import axios from 'axios';
 
 const Login = () => {
   const navigate = useNavigate();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [form, setFormData] = useState({
+    email:"",
+    password:""
+})
 
-  const handleSubmit = (e: React.FormEvent) => {
+const handleInput = (e:React.ChangeEvent<HTMLInputElement>)=>{
+  const {name, value}=e.target;
+    setFormData(prev =>({
+      ...prev,
+      [name] :value
+    }))
+}
+
+
+  const handleSubmit = async(e: React.FormEvent) => {
     e.preventDefault();
-    localStorage.setItem('user', JSON.stringify({ email }));
+    try{
+      const login = await axios.post(
+        'https;//localhost:3000/api/auth/login', form
+      );
+      console.log(login);
+      localStorage.setItem("token", login.data.token);
+      localStorage.setItem("username", login.data.username);
+
+      if(login.data.email){
+          navigate('./Dashboard')
+      }else{
+              console.log("login failed")
+      }
+    }
+    catch(err){
+      console.log("Err in signup", err);
+    }
+    finally {
+    setFormData({ email: "", password: "" });
+  }
+    localStorage.setItem('user', JSON.stringify( form.email ));
     navigate('/dashboard');
   };
 
@@ -38,8 +70,8 @@ const Login = () => {
                 <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 text-amber-500 w-5 h-5" />
                 <input
                   type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  value={form.email}
+                  onChange={handleInput}
                   className="w-full pl-12 pr-4 py-4 border-2 border-gray-200 rounded-xl focus:border-amber-400 focus:outline-none transition-colors bg-white"
                   placeholder="Enter your email"
                   required
@@ -55,8 +87,8 @@ const Login = () => {
                 <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 text-amber-500 w-5 h-5" />
                 <input
                   type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  value={form.password}
+                  onChange={handleInput}
                   className="w-full pl-12 pr-4 py-4 border-2 border-gray-200 rounded-xl focus:border-amber-400 focus:outline-none transition-colors bg-white"
                   placeholder="Enter your password"
                   required
@@ -68,7 +100,7 @@ const Login = () => {
               type="submit"
               className="w-full py-4 bg-gradient-to-r from-amber-500 to-yellow-400 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-300"
             >
-              Sign In
+              Log In
             </button>
           </form>
 
