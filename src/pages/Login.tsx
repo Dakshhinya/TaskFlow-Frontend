@@ -18,19 +18,21 @@ const handleInput = (e:React.ChangeEvent<HTMLInputElement>)=>{
     }))
 }
 
-
   const handleSubmit = async(e: React.FormEvent) => {
     e.preventDefault();
     try{
       const login = await axios.post(
-        'https;//localhost:3000/api/auth/login', form
+        'http://localhost:3000/api/auth/login', form
       );
       console.log(login);
       localStorage.setItem("token", login.data.token);
       localStorage.setItem("username", login.data.username);
 
       if(login.data.email){
-          navigate('./Dashboard')
+        localStorage.setItem("token", login.data.token);
+        localStorage.setItem("username", login.data.username);
+        // localStorage.setItem("user", JSON.stringify(form.email));
+        navigate('/dashboard');
       }else{
               console.log("login failed")
       }
@@ -41,8 +43,7 @@ const handleInput = (e:React.ChangeEvent<HTMLInputElement>)=>{
     finally {
     setFormData({ email: "", password: "" });
   }
-    localStorage.setItem('user', JSON.stringify( form.email ));
-    navigate('/dashboard');
+    
   };
 
   return (
@@ -70,6 +71,7 @@ const handleInput = (e:React.ChangeEvent<HTMLInputElement>)=>{
                 <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 text-amber-500 w-5 h-5" />
                 <input
                   type="email"
+                   name="email"
                   value={form.email}
                   onChange={handleInput}
                   className="w-full pl-12 pr-4 py-4 border-2 border-gray-200 rounded-xl focus:border-amber-400 focus:outline-none transition-colors bg-white"
@@ -87,6 +89,7 @@ const handleInput = (e:React.ChangeEvent<HTMLInputElement>)=>{
                 <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 text-amber-500 w-5 h-5" />
                 <input
                   type="password"
+                   name="password"
                   value={form.password}
                   onChange={handleInput}
                   className="w-full pl-12 pr-4 py-4 border-2 border-gray-200 rounded-xl focus:border-amber-400 focus:outline-none transition-colors bg-white"
