@@ -39,10 +39,10 @@ const TaskCard = ({ task, onToggleComplete, showCompleteButton = true }: TaskCar
   return (
     <div className="bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 p-5 border-2 border-amber-100">
       <div className="flex items-start justify-between mb-3">
-        <h3 className="text-xl font-bold text-gray-800 flex-1">{task.name}</h3>
+        <h3 className="text-xl font-bold text-gray-800 flex-1">{task.taskname}</h3>
         {showCompleteButton && task.status !== 'completed' && (
           <button
-            onClick={() => onToggleComplete?.(task.id)}
+            onClick={() => onToggleComplete?.(task.taskId!)}
             className="ml-2 p-2 bg-green-100 hover:bg-green-200 text-green-600 rounded-lg transition-colors duration-300"
             title="Mark as completed"
           >
@@ -69,8 +69,8 @@ const TaskCard = ({ task, onToggleComplete, showCompleteButton = true }: TaskCar
         </div>
         <div className="flex items-center">
           <Clock className="w-4 h-4 mr-2 text-amber-500" />
-          <span className="font-medium">Deadline:</span>
-          <span className="ml-2">{task.deadlineDate} at {task.deadlineTime}</span>
+          <span className="font-medium">End:</span>
+          <span className="ml-2">{task.endDate} at {task.endTime}</span>
         </div>
       </div>
     </div>

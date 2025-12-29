@@ -16,35 +16,35 @@ const handleInput = (e:React.ChangeEvent<HTMLInputElement>)=>{
       ...prev,
       [name] :value
     }))
+    
 }
 
-  const handleSubmit = async(e: React.FormEvent) => {
-    e.preventDefault();
-    try{
-      const login = await axios.post(
-        'http://localhost:3000/api/auth/login', form
-      );
-      console.log(login);
-      localStorage.setItem("token", login.data.token);
-      localStorage.setItem("username", login.data.username);
+  const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
 
-      if(login.data.email){
-        localStorage.setItem("token", login.data.token);
-        localStorage.setItem("username", login.data.username);
-        // localStorage.setItem("user", JSON.stringify(form.email));
-        navigate('/dashboard');
-      }else{
-              console.log("login failed")
-      }
+  try {
+    const response = await axios.post(
+      "http://localhost:3000/api/auth/login",
+      form
+    );
+
+    const { token, username, email, userId } = response.data;
+    if (!token || !email || !userId) {
+      console.log("Invalid login response");
+      return;
     }
-    catch(err){
-      console.log("Err in signup", err);
-    }
-    finally {
-    setFormData({ email: "", password: "" });
-  }
     
-  };
+    localStorage.setItem("token", token);
+    localStorage.setItem(
+      "user",
+      JSON.stringify({ userId, username, email })
+    );
+
+    navigate("/dashboard");
+  } catch (err) {
+    console.error("Login error:", err);
+  }
+};
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-white via-yellow-50 to-amber-100 flex items-center justify-center px-4">

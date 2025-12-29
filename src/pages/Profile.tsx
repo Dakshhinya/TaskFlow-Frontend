@@ -9,6 +9,7 @@ const Profile = () => {
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
+    // const token = localStorage.getItem()/
     if (storedUser) {
       setUser(JSON.parse(storedUser));
     }

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { X, Calendar, Clock, Flag } from 'lucide-react';
+import axios from 'axios';
 
 interface TaskModalProps {
   isOpen: boolean;
@@ -8,15 +9,15 @@ interface TaskModalProps {
 }
 
 export interface Task {
-  id: string;
-  name: string;
+  taskId?: string;
+  taskname: string;
   priority: 'low' | 'medium' | 'high';
   startDate: string;
   startTime: string;
-  deadlineDate: string;
-  deadlineTime: string;
+  endDate: string;
+  endTime: string;
   status: 'upcoming' | 'in-progress' | 'completed' | 'overdue';
-  createdAt: string;
+  createdAt?: string;
 }
 
 const TaskModal = ({ isOpen, onClose, onSave }: TaskModalProps) => {
@@ -24,35 +25,72 @@ const TaskModal = ({ isOpen, onClose, onSave }: TaskModalProps) => {
   const [priority, setPriority] = useState<'low' | 'medium' | 'high'>('medium');
   const [startDate, setStartDate] = useState('');
   const [startTime, setStartTime] = useState('');
-  const [deadlineDate, setDeadlineDate] = useState('');
-  const [deadlineTime, setDeadlineTime] = useState('');
+  const [endDate, setEndDate] = useState('');
+  const [endTime, setEndTime] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const token = localStorage.getItem("token");
+if (!token) {
+  alert("Please login first!");
+  return;
+}
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const task: Task = {
-      id: Date.now().toString(),
-      name: taskName,
+    const newTask: Task = {
+      taskname: taskName,
       priority,
       startDate,
       startTime,
-      deadlineDate,
-      deadlineTime,
-      status: 'upcoming',
-      createdAt: new Date().toISOString(),
+      endDate,
+      endTime,
+      status: 'upcoming', 
     };
 
-    onSave(task);
-    resetForm();
-  };
+     try{
+      const res = await axios.post(
+        'http://localhost:3000/api/task/create',
+        {
+          taskname: newTask.taskname,
+          priority: newTask.priority,
+          start_date: newTask.startDate,
+          start_time: newTask.startTime,
+          end_date: newTask.endDate,
+          end_time: newTask.endTime,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          },
+        }
+      );
+      console.log("Task created:", res.data);
 
+       onSave({
+    taskId: res.data.taskid,  
+  taskname: res.data.taskname,
+  priority: res.data.priority,
+  startDate: res.data.start_date,
+  startTime: res.data.start_time,
+  endDate: res.data.end_date,
+  endTime: res.data.end_time,
+  status: "upcoming",
+});
+    resetForm();
+      // navigate('/dasboard')
+    }
+    catch(err){
+      console.log("Err in signup", err);
+    }
+   
+  };
   const resetForm = () => {
     setTaskName('');
     setPriority('medium');
     setStartDate('');
     setStartTime('');
-    setDeadlineDate('');
-    setDeadlineTime('');
+    setEndDate('');
+    setEndTime('');
     onClose();
   };
 
@@ -165,8 +203,8 @@ const TaskModal = ({ isOpen, onClose, onSave }: TaskModalProps) => {
               </label>
               <input
                 type="date"
-                value={deadlineDate}
-                onChange={(e) => setDeadlineDate(e.target.value)}
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
                 className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-amber-400 focus:outline-none transition-colors bg-white"
                 required
               />
@@ -178,8 +216,8 @@ const TaskModal = ({ isOpen, onClose, onSave }: TaskModalProps) => {
               </label>
               <input
                 type="time"
-                value={deadlineTime}
-                onChange={(e) => setDeadlineTime(e.target.value)}
+                value={endTime}
+                onChange={(e) => setEndTime(e.target.value)}
                 className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-amber-400 focus:outline-none transition-colors bg-white"
                 required
               />
@@ -208,3 +246,4 @@ const TaskModal = ({ isOpen, onClose, onSave }: TaskModalProps) => {
 };
 
 export default TaskModal;
+

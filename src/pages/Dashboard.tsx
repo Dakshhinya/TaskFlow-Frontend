@@ -4,25 +4,50 @@ import Navbar from '../components/Navbar';
 import TaskModal, { Task } from '../components/TaskModal';
 import TaskCard from '../components/TaskCard';
 import { updateTaskStatus, updateAllTasksStatus } from '../utils/taskStatus';
+import axios from 'axios';
 
 const Dashboard = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [userName, setUserName] = useState('User');
 
-  useEffect(() => {
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      const user = JSON.parse(storedUser);
-      setUserName(user.name || 'User');
-    }
 
-    const storedTasks = localStorage.getItem('tasks');
-    if (storedTasks) {
-      const parsedTasks = JSON.parse(storedTasks);
-      setTasks(updateAllTasksStatus(parsedTasks));
+
+  useEffect(()=>{
+
+    const fetchTask=async()=>{
+      try{
+        const storedUser = localStorage.getItem('user')
+        const token = localStorage.getItem('token')?.replace(/"/g, '');
+
+        if(storedUser){
+          const user = JSON.parse(storedUser)
+          setUserName(user.name || 'User')
+        }
+
+        if(!token){
+          console.error("No token found");
+          return;
+        }
+console.log("Token from localStorage:", token);
+
+        const response = await axios.get("http://localhost:3000/api/task/list", {
+  headers: {
+    Authorization: `Bearer ${token}`
+  }
+});
+console.log("TOKEN SENT:", token);
+
+        const fetchedData = response.data.tasks
+        console.log("Fetched tasks: ", fetchedData)
+
+        setTasks(updateAllTasksStatus(fetchedData))
+      }catch (error){
+        console.log("Error fetching tasks: ", error)
+      }
     }
-  }, []);
+    fetchTask();
+  },[])
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -32,6 +57,8 @@ const Dashboard = () => {
     return () => clearInterval(interval);
   }, []);
 
+
+
   const handleSaveTask = (newTask: Task) => {
     const updatedTask = updateTaskStatus(newTask);
     const updatedTasks = [...tasks, updatedTask];
@@ -40,14 +67,14 @@ const Dashboard = () => {
   };
 
   const handleToggleComplete = (taskId: string) => {
-    const updatedTasks = tasks.map((task) =>
-      task.id === taskId ? { ...task, status: 'completed' as const } : task
-    );
-    setTasks(updatedTasks);
-    localStorage.setItem('tasks', JSON.stringify(updatedTasks));
+    const updatedTask = tasks.map(task =>
+      task.taskId === taskId ? {...task, status: "completed"} :task
+    )
+    setTasks(updatedTask);
+    localStorage.setItem("tasks", JSON.stringify(updatedTask))
   };
 
-  const upcomingTasks = tasks.filter((task) => task.status === 'upcoming').slice(0, 3);
+  const upcomingTasks = tasks.filter((task) => task.status === 'upcoming');
   const inProgressTasks = tasks.filter((task) => task.status === 'in-progress');
   const completedTasks = tasks.filter((task) => task.status === 'completed');
   const overdueTasks = tasks.filter((task) => task.status === 'overdue');
@@ -117,7 +144,7 @@ const Dashboard = () => {
           {upcomingTasks.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {upcomingTasks.map((task) => (
-                <TaskCard key={task.id} task={task} onToggleComplete={handleToggleComplete} />
+                <TaskCard key={task.taskId} task={task} onToggleComplete={handleToggleComplete} />
               ))}
             </div>
           ) : (
@@ -135,8 +162,8 @@ const Dashboard = () => {
             </h3>
             {inProgressTasks.length > 0 ? (
               <div className="space-y-4">
-                {inProgressTasks.slice(0, 3).map((task) => (
-                  <TaskCard key={task.id} task={task} onToggleComplete={handleToggleComplete} />
+                {inProgressTasks.map((task) => (
+                  <TaskCard key={task.taskId} task={task} onToggleComplete={handleToggleComplete} />
                 ))}
               </div>
             ) : (
@@ -151,8 +178,8 @@ const Dashboard = () => {
             </h3>
             {overdueTasks.length > 0 ? (
               <div className="space-y-4">
-                {overdueTasks.slice(0, 3).map((task) => (
-                  <TaskCard key={task.id} task={task} onToggleComplete={handleToggleComplete} />
+                {overdueTasks.map((task) => (
+                  <TaskCard key={task.taskId} task={task} onToggleComplete={handleToggleComplete} />
                 ))}
               </div>
             ) : (
