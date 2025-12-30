@@ -19,7 +19,7 @@ const Signup = () => {
     e.preventDefault();
     try{
       const res = await axios.post(
-        'http://localhost:3000/api/auth/signup',form
+        '${import.meta.env.VITE_API_URL}/api/auth/signup',form
       );
       console.log(res.data);
       localStorage.setItem('user', JSON.stringify({ username:form.username, email:form.email }));

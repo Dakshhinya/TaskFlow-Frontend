@@ -31,7 +31,7 @@ const Dashboard = () => {
         }
 console.log("Token from localStorage:", token);
 
-        const response = await axios.get("http://localhost:3000/api/task/list", {
+        const response = await axios.get("${import.meta.env.VITE_API_URL}/api/task/list", {
   headers: {
     Authorization: `Bearer ${token}`
   }
