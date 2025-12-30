@@ -49,7 +49,7 @@ if (!token) {
 
      try{
       const res = await axios.post(
-        '${import.meta.env.VITE_API_URL}api/task/create',
+        `${import.meta.env.VITE_API_URL}api/task/create`,
         {
           taskname: newTask.taskname,
           priority: newTask.priority,
