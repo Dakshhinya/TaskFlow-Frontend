@@ -3,7 +3,7 @@ import { CheckCircle, Clock, TrendingUp, AlertCircle } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import TaskCard from '../components/TaskCard';
 import { Task } from '../components/TaskModal';
-import { updateAllTasksStatus } from '../utils/taskStatus';
+import { updateTasksStatus } from '../utils/taskStatus';
 
 const Tasks = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -13,22 +13,25 @@ const Tasks = () => {
     const storedTasks = localStorage.getItem('tasks');
     if (storedTasks) {
       const parsedTasks = JSON.parse(storedTasks);
-      setTasks(updateAllTasksStatus(parsedTasks));
+      setTasks(updateTasksStatus(parsedTasks));
     }
   }, []);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setTasks((prevTasks) => updateAllTasksStatus(prevTasks));
+      setTasks((prevTasks) => updateTasksStatus(prevTasks));
     }, 60000);
 
     return () => clearInterval(interval);
   }, []);
 
   const handleToggleComplete = (taskId: string) => {
-    const updatedTasks = tasks.map((task) =>
-      task.id === taskId ? { ...task, status: 'completed' as const } : task
-    );
+   const updatedTasks = tasks.map((task) =>
+    task.taskId === taskId
+      ? { ...task, status: 'completed' as const }
+      : task
+  );
+
     setTasks(updatedTasks);
     localStorage.setItem('tasks', JSON.stringify(updatedTasks));
   };
@@ -92,7 +95,7 @@ const Tasks = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredTasks.map((task) => (
                 <TaskCard
-                  key={task.id}
+                  key={task.taskId}
                   task={task}
                   onToggleComplete={handleToggleComplete}
                   showCompleteButton={task.status !== 'completed'}
@@ -103,7 +106,8 @@ const Tasks = () => {
             <div className="text-center py-20">
               <div className="flex justify-center mb-4">
                 <div className="bg-gradient-to-r from-amber-400 to-yellow-300 p-6 rounded-full">
-                  <CheckCircle className="w-16 h-16 text-white" />
+                  <CheckCircle 
+                  className="w-16 h-16 text-white" />
                 </div>
               </div>
               <h3 className="text-2xl font-bold text-gray-700 mb-2">No tasks found</h3>

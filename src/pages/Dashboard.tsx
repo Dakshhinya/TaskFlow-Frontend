@@ -3,7 +3,7 @@ import { Plus, TrendingUp, Clock, CheckCircle, AlertCircle } from 'lucide-react'
 import Navbar from '../components/Navbar';
 import TaskModal, { Task } from '../components/TaskModal';
 import TaskCard from '../components/TaskCard';
-import { updateTaskStatus, updateAllTasksStatus } from '../utils/taskStatus';
+import { updateTaskStatus, updateTasksStatus } from '../utils/taskStatus';
 import axios from 'axios';
 
 const Dashboard = () => {
@@ -41,7 +41,7 @@ console.log("TOKEN SENT:", token);
         const fetchedData = response.data.tasks
         console.log("Fetched tasks: ", fetchedData)
 
-        setTasks(updateAllTasksStatus(fetchedData))
+        setTasks(updateTasksStatus(fetchedData))
       }catch (error){
         console.log("Error fetching tasks: ", error)
       }
@@ -51,7 +51,7 @@ console.log("TOKEN SENT:", token);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setTasks((prevTasks) => updateAllTasksStatus(prevTasks));
+      setTasks((prevTasks) => updateTasksStatus(prevTasks));
     }, 60000);
 
     return () => clearInterval(interval);

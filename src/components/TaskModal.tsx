@@ -28,15 +28,16 @@ const TaskModal = ({ isOpen, onClose, onSave }: TaskModalProps) => {
   const [endDate, setEndDate] = useState('');
   const [endTime, setEndTime] = useState('');
 
-  const token = localStorage.getItem("token");
-if (!token) {
-  alert("Please login first!");
-  return;
-}
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+     const token = localStorage.getItem("token");
+      if (!token) {
+      alert("Please login first!");
+      return;
+  }
     const newTask: Task = {
       taskname: taskName,
       priority,
@@ -45,11 +46,14 @@ if (!token) {
       endDate,
       endTime,
       status: 'upcoming', 
+
+      
     };
 
+     
      try{
       const res = await axios.post(
-        `${import.meta.env.VITE_API_URL}api/task/create`,
+        `${import.meta.env.VITE_API_URL}/api/task/create`,
         {
           taskname: newTask.taskname,
           priority: newTask.priority,
@@ -79,8 +83,8 @@ if (!token) {
     resetForm();
       // navigate('/dasboard')
     }
-    catch(err){
-      console.log("Err in signup", err);
+    catch(err:any){
+      console.error("Task creation failed:", err.response?.data || err.message);
     }
    
   };

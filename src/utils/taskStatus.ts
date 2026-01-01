@@ -22,6 +22,6 @@ export const updateTaskStatus = (task: Task): Task => {
   return { ...task, status: newStatus };
 };
 
-export const updateAllTasksStatus = (tasks: Task[]): Task[] => {
+export const updateTasksStatus = (tasks: Task[]): Task[] => {
   return tasks.map(updateTaskStatus);
 };
